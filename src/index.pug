@@ -1,0 +1,23 @@
+doctype html
+html(lang="en")
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    link(rel="stylesheet", href="./styles.css")
+    title Did Ray Write This Week?
+  body 
+    h1.text-center.text-5xl.font-light.mt-16 Did Ray write this week?
+    h2.text-center.text-8xl.mt-8.mb-16= currentWeekState === 'y' ? 'Yes' : 'No'
+    div.w-min.mx-auto
+      each weeks, year in weekStatesByYear
+        dl.font-medium.text-xl.mb-2= year 
+        dt.flex.gap-1
+          each week in weeks
+            - var classObject = {'bg-gray-300': week === 'u', 'bg-green-300': week === 'y', 'bg-red-300': week === 'n'};
+            div.h-4.w-4.rounded(class=classObject)
+
+    .absolute.bottom-2.w-full.text-xs.text-center.text-gray-600.px-2
+      | Made with ❤️ by 
+      a.text-blue-500.underline(href='https://www.raygesualdo.com') Ray Gesualdo
+      |  | Open sourced on 
+      a.text-blue-500.underline(href='https://github.com/raygesualdo/didraywritethisweek') GitHub
