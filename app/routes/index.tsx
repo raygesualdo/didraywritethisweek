@@ -16,17 +16,19 @@ export const loader: LoaderFunction = async () => {
 export default function Index() {
   const data = useLoaderData<DataPayload>()
   return (
-    <>
+    <div className="px-8">
       <h1 className="font-light mt-16 text-5xl text-center">
         Did Ray write this week?
       </h1>
-      <h2 className="mb-16 mt-8 text-8xl text-center">Yes</h2>
-      <div className="mx-auto w-min">
+      <h2 className="mb-16 mt-8 text-8xl text-center">
+        {data.currentWeekState === 'y' ? 'Yes' : 'No'}
+      </h2>
+      <div className="mx-auto w-max max-w-full">
         {Object.entries(data.weekStatesByYear).map(([year, weeks]) => {
           return (
             <Fragment key={year}>
               <dl className="font-medium mb-2 text-xl">{year}</dl>
-              <dt className="flex gap-1">
+              <dt className="flex gap-1 flex-wrap">
                 {weeks.map((week, index) => {
                   return (
                     <div
@@ -56,6 +58,6 @@ export default function Index() {
           GitHub
         </a>
       </div>
-    </>
+    </div>
   )
 }
