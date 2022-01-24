@@ -1,32 +1,61 @@
+import { Fragment } from 'react'
+import { json, LoaderFunction, useLoaderData } from 'remix'
+import { DataPayload, getData, WeekState } from '~/lib/data.server'
+
+const classMap: Record<WeekState, string> = {
+  y: 'bg-green-300',
+  n: 'bg-red-300',
+  u: 'bg-gray-300',
+}
+
+export const loader: LoaderFunction = async () => {
+  const data = await getData()
+  return json(data)
+}
+
 export default function Index() {
+  const data = useLoaderData<DataPayload>()
   return (
-    <div style={{ fontFamily: "system-ui, sans-serif", lineHeight: "1.4" }}>
-      <h1>Welcome to Remix</h1>
-      <ul>
-        <li>
-          <a
-            target="_blank"
-            href="https://remix.run/tutorials/blog"
-            rel="noreferrer"
-          >
-            15m Quickstart Blog Tutorial
-          </a>
-        </li>
-        <li>
-          <a
-            target="_blank"
-            href="https://remix.run/tutorials/jokes"
-            rel="noreferrer"
-          >
-            Deep Dive Jokes App Tutorial
-          </a>
-        </li>
-        <li>
-          <a target="_blank" href="https://remix.run/docs" rel="noreferrer">
-            Remix Docs
-          </a>
-        </li>
-      </ul>
-    </div>
-  );
+    <>
+      <h1 className="font-light mt-16 text-5xl text-center">
+        Did Ray write this week?
+      </h1>
+      <h2 className="mb-16 mt-8 text-8xl text-center">Yes</h2>
+      <div className="mx-auto w-min">
+        {Object.entries(data.weekStatesByYear).map(([year, weeks]) => {
+          return (
+            <Fragment key={year}>
+              <dl className="font-medium mb-2 text-xl">{year}</dl>
+              <dt className="flex gap-1">
+                {weeks.map((week, index) => {
+                  return (
+                    <div
+                      key={index}
+                      className={`h-4 rounded w-4 ${classMap[week]}`}
+                    />
+                  )
+                })}
+              </dt>
+            </Fragment>
+          )
+        })}
+      </div>
+      <div className="absolute bottom-2 px-2 text-center text-gray-600 text-xs w-full">
+        Made with ❤️ by{' '}
+        <a
+          className="text-blue-500 underline"
+          href="https://www.raygesualdo.com"
+        >
+          Ray Gesualdo
+        </a>{' '}
+        | Open sourced on{' '}
+        <a
+          className="text-blue-500 underline"
+          href="https://github.com/raygesualdo/didraywritethisweek"
+        >
+          GitHub
+        </a>
+      </div>
+    </>
+  )
 }
