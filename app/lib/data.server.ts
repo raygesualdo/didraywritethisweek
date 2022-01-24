@@ -29,7 +29,9 @@ async function downloadFile(url: string, filepath: string) {
   const response = await fetch(url)
   const filestream = fs.createWriteStream(filepath)
   return new Promise((resolve, reject) => {
+    // @ts-expect-error Types for `Response.body` aren't quite right
     response.body?.pipe(filestream)
+    // @ts-expect-error Types for `Response.body` aren't quite right
     response.body?.on('error', reject)
     filestream.on('finish', resolve)
   })
@@ -81,6 +83,7 @@ async function getEntries() {
         return { date, year, weekOfYear: getISOWeek(new Date(date)) }
       })
   })
+  // @ts-expect-error Assigning `entries` in the tempy task doesn't sit well with TS
   return entries
 }
 
@@ -92,7 +95,9 @@ function deriveWeekStates(
     YEARS_TO_PROCESS.map((year) => {
       if (!entriesByYear[year]) return []
 
-      const numOfWeeksInYear = getISOWeeksInYear(new Date(year, 0, 1))
+      const numOfWeeksInYear = getISOWeeksInYear(
+        new Date(Number.parseInt(year, 10), 0, 1)
+      )
       const weeks = Array.from(
         { length: numOfWeeksInYear - 1 },
         (_, index) => index + 1
