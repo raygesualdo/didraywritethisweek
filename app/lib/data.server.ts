@@ -122,15 +122,16 @@ export interface DataPayload {
   currentWeekState: WeekState
 }
 
-let cachedData: DataPayload | undefined
+const cache = new Map<string, DataPayload>()
+const cacheKey = 'data'
 
 export async function getData() {
-  if (cachedData) {
-    console.log('DEBUG: Data cache warm. Using cached data.')
-    return cachedData
+  if (cache.has(cacheKey)) {
+    console.log('CACHE: Data cache warm. Using cached data.')
+    return cache.get(cacheKey)
   }
 
-  console.log('DEBUG: Data cache cold. Populating cache.')
+  console.log('CACHE: Data cache cold. Populating cache.')
   const entries = await getEntries()
   const entriesByYear = entries.reduce((acc, item) => {
     if (acc[item.year]) {
@@ -146,16 +147,17 @@ export async function getData() {
   const weekStatesByYear = deriveWeekStates(entriesByYear, currentWeek)
   const currentWeekState = getCurrentWeekState(weekStatesByYear, currentWeek)
 
-  cachedData = {
+  cache.set(cacheKey, {
     entriesByYear,
     weekStatesByYear,
     currentWeekState,
-  }
-  return cachedData
+  })
+  return cache.get(cacheKey)
 }
 
 export function clearCache() {
-  cachedData = undefined
+  console.log('CACHE: Clearing cache.')
+  cache.delete(cacheKey)
 }
 
 function getCurrentWeekState(result: WeekStatesByYear, currentWeek: number) {
