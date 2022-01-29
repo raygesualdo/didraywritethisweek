@@ -9,11 +9,13 @@ import { getISOWeek, getISOWeeksInYear, getYear } from 'date-fns'
 const YEARS_TO_PROCESS = ['2022'] as const
 const CURRENT_WEEK = getISOWeek(new Date())
 
-export enum WeekState {
-  Yes = 'y',
-  No = 'n',
-  Unknown = 'u',
-}
+export const WeekStateEnum = {
+  Yes: 'y',
+  No: 'n',
+  Unknown: 'u',
+} as const
+
+export type WeekState = typeof WeekStateEnum[keyof typeof WeekStateEnum]
 
 interface Entry {
   date: string
@@ -107,8 +109,8 @@ function deriveWeekStates(
       )
 
       const yolo = weeks.map((week) => {
-        if (week > currentWeek) return WeekState.Unknown
-        return weeksWithEntries.has(week) ? WeekState.Yes : WeekState.No
+        if (week > currentWeek) return WeekStateEnum.Unknown
+        return weeksWithEntries.has(week) ? WeekStateEnum.Yes : WeekStateEnum.No
       })
 
       return [year, yolo]
