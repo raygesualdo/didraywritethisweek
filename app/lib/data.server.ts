@@ -1,8 +1,7 @@
-import * as fs from 'node:fs'
-import * as path from 'node:path'
+import * as fs from 'fs'
+import * as path from 'path'
 import matter from 'gray-matter'
 import yaml from 'js-yaml'
-import fetch from 'node-fetch'
 import tempy from 'tempy'
 import extract from 'extract-zip'
 import { getISOWeek, getISOWeeksInYear, getYear } from 'date-fns'
@@ -10,11 +9,13 @@ import { getISOWeek, getISOWeeksInYear, getYear } from 'date-fns'
 const YEARS_TO_PROCESS = ['2022'] as const
 const CURRENT_WEEK = getISOWeek(new Date())
 
-enum WeekState {
-  Yes = 'y',
-  No = 'n',
-  Unknown = 'u',
-}
+export const WeekStateEnum = {
+  Yes: 'y',
+  No: 'n',
+  Unknown: 'u',
+} as const
+
+export type WeekState = typeof WeekStateEnum[keyof typeof WeekStateEnum]
 
 interface Entry {
   date: string
@@ -30,7 +31,9 @@ async function downloadFile(url: string, filepath: string) {
   const response = await fetch(url)
   const filestream = fs.createWriteStream(filepath)
   return new Promise((resolve, reject) => {
+    // @ts-expect-error Types for `Response.body` aren't quite right
     response.body?.pipe(filestream)
+    // @ts-expect-error Types for `Response.body` aren't quite right
     response.body?.on('error', reject)
     filestream.on('finish', resolve)
   })
@@ -82,6 +85,7 @@ async function getEntries() {
         return { date, year, weekOfYear: getISOWeek(new Date(date)) }
       })
   })
+  // @ts-expect-error Assigning `entries` in the tempy task doesn't sit well with TS
   return entries
 }
 
@@ -93,7 +97,9 @@ function deriveWeekStates(
     YEARS_TO_PROCESS.map((year) => {
       if (!entriesByYear[year]) return []
 
-      const numOfWeeksInYear = getISOWeeksInYear(new Date(year, 0, 1))
+      const numOfWeeksInYear = getISOWeeksInYear(
+        new Date(Number.parseInt(year, 10), 0, 1)
+      )
       const weeks = Array.from(
         { length: numOfWeeksInYear - 1 },
         (_, index) => index + 1
@@ -103,8 +109,8 @@ function deriveWeekStates(
       )
 
       const yolo = weeks.map((week) => {
-        if (week > currentWeek) return WeekState.Unknown
-        return weeksWithEntries.has(week) ? WeekState.Yes : WeekState.No
+        if (week > currentWeek) return WeekStateEnum.Unknown
+        return weeksWithEntries.has(week) ? WeekStateEnum.Yes : WeekStateEnum.No
       })
 
       return [year, yolo]
@@ -112,13 +118,22 @@ function deriveWeekStates(
   )
 }
 
-function writeDataToJsonFile(filepath: string, data: unknown) {
-  fs.writeFileSync(filepath, JSON.stringify(data), 'utf-8')
+export interface DataPayload {
+  entriesByYear: EntriesByYear
+  weekStatesByYear: WeekStatesByYear
+  currentWeekState: WeekState
 }
 
-async function main() {
-  if (fs.existsSync('./data.json')) return
+const cache = new Map<string, DataPayload>()
+const cacheKey = 'data'
 
+export async function getData() {
+  if (cache.has(cacheKey)) {
+    console.log('CACHE: Data cache warm. Using cached data.')
+    return cache.get(cacheKey)
+  }
+
+  console.log('CACHE: Data cache cold. Populating cache.')
   const entries = await getEntries()
   const entriesByYear = entries.reduce((acc, item) => {
     if (acc[item.year]) {
@@ -134,15 +149,18 @@ async function main() {
   const weekStatesByYear = deriveWeekStates(entriesByYear, currentWeek)
   const currentWeekState = getCurrentWeekState(weekStatesByYear, currentWeek)
 
-  writeDataToJsonFile('./entriesByYear.json', entriesByYear)
-  writeDataToJsonFile('./data.json', {
+  cache.set(cacheKey, {
     entriesByYear,
     weekStatesByYear,
     currentWeekState,
   })
+  return cache.get(cacheKey)
 }
 
-main()
+export function clearCache() {
+  console.log('CACHE: Clearing cache.')
+  cache.delete(cacheKey)
+}
 
 function getCurrentWeekState(result: WeekStatesByYear, currentWeek: number) {
   const currentYear = getYear(new Date())
