@@ -35,7 +35,7 @@ jobs:
         run: npm run typecheck
 
       - name: Deploy to Fly.io
-        if: github.ref == 'refs/heads/master'
+        if: github.ref == 'refs/heads/main'
         uses: superfly/flyctl-actions@1.1
         with:
           args: 'deploy'
