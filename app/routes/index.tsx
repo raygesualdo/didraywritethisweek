@@ -56,6 +56,13 @@ export default function Index() {
           href="https://github.com/raygesualdo/didraywritethisweek"
         >
           GitHub
+        </a>{' '}
+        | Analytics responsibly gathered via{' '}
+        <a
+          className="text-blue-600 underline"
+          href="https://plausible.io/didraywritethisweek.raygesualdo.com"
+        >
+          Plausible
         </a>
       </div>
     </div>

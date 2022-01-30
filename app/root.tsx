@@ -25,6 +25,13 @@ export default function App() {
         <meta name="viewport" content="width=device-width,initial-scale=1" />
         <Meta />
         <Links />
+        {process.env.NODE_ENV === 'production' && (
+          <script
+            defer
+            data-domain="didraywritethisweek.raygesualdo.com"
+            src="https://plausible.io/js/plausible.js"
+          ></script>
+        )}
       </head>
       <body>
         <Outlet />
