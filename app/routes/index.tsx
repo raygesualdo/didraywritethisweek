@@ -45,14 +45,14 @@ export default function Index() {
       <div className="absolute bottom-2 px-2 text-center text-gray-600 text-xs w-full">
         Made with ❤️ by{' '}
         <a
-          className="text-blue-500 underline"
+          className="text-blue-600 underline"
           href="https://www.raygesualdo.com"
         >
           Ray Gesualdo
         </a>{' '}
         | Open sourced on{' '}
         <a
-          className="text-blue-500 underline"
+          className="text-blue-600 underline"
           href="https://github.com/raygesualdo/didraywritethisweek"
         >
           GitHub
