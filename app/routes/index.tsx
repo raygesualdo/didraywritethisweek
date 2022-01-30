@@ -27,8 +27,8 @@ export default function Index() {
         {Object.entries(data.weekStatesByYear).map(([year, weeks]) => {
           return (
             <Fragment key={year}>
-              <dl className="font-medium mb-2 text-xl">{year}</dl>
-              <dt className="flex gap-1 flex-wrap">
+              <h3 className="font-medium mb-2 text-xl">{year}</h3>
+              <div className="flex gap-1 flex-wrap">
                 {weeks.map((week, index) => {
                   return (
                     <div
@@ -37,7 +37,7 @@ export default function Index() {
                     />
                   )
                 })}
-              </dt>
+              </div>
             </Fragment>
           )
         })}
