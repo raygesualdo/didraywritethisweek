@@ -42,28 +42,36 @@ export default function Index() {
           )
         })}
       </div>
-      <div className="absolute bottom-2 px-2 text-center text-gray-600 text-xs w-full">
-        Made with ❤️ by{' '}
-        <a
-          className="text-blue-600 underline"
-          href="https://www.raygesualdo.com"
-        >
-          Ray Gesualdo
-        </a>{' '}
-        | Open sourced on{' '}
-        <a
-          className="text-blue-600 underline"
-          href="https://github.com/raygesualdo/didraywritethisweek"
-        >
-          GitHub
-        </a>{' '}
-        | Analytics responsibly gathered via{' '}
-        <a
-          className="text-blue-600 underline"
-          href="https://plausible.io/didraywritethisweek.raygesualdo.com"
-        >
-          Plausible
-        </a>
+      <div className="absolute left-0 bottom-2 px-2 text-center text-gray-600 text-xs w-full flex flex-col sm:block">
+        <span>
+          Made with ❤️ by{' '}
+          <a
+            className="text-blue-600 underline"
+            href="https://www.raygesualdo.com"
+          >
+            Ray Gesualdo
+          </a>
+        </span>
+        <span className="hidden sm:inline"> | </span>
+        <span>
+          Open sourced on{' '}
+          <a
+            className="text-blue-600 underline"
+            href="https://github.com/raygesualdo/didraywritethisweek"
+          >
+            GitHub
+          </a>
+        </span>
+        <span className="hidden sm:inline"> | </span>
+        <span>
+          Analytics responsibly gathered via{' '}
+          <a
+            className="text-blue-600 underline"
+            href="https://plausible.io/didraywritethisweek.raygesualdo.com"
+          >
+            Plausible
+          </a>
+        </span>
       </div>
     </div>
   )
