@@ -7,7 +7,6 @@ import extract from 'extract-zip'
 import { getISOWeek, getISOWeeksInYear, getYear } from 'date-fns'
 
 const YEARS_TO_PROCESS = ['2022'] as const
-const CURRENT_WEEK = getISOWeek(new Date())
 
 export const WeekStateEnum = {
   Yes: 'y',
@@ -164,5 +163,5 @@ export function clearCache() {
 
 function getCurrentWeekState(result: WeekStatesByYear, currentWeek: number) {
   const currentYear = getYear(new Date())
-  return result[String(currentYear) as keyof WeekStatesByYear][CURRENT_WEEK - 1]
+  return result[String(currentYear) as keyof WeekStatesByYear][currentWeek - 1]
 }
