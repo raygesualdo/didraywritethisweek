@@ -123,13 +123,15 @@ export interface DataPayload {
   currentWeekState: WeekState
 }
 
-const cache = new Map<string, DataPayload>()
+type CachedDataPayload = Pick<DataPayload, 'entriesByYear'>
+
+const cache = new Map<string, CachedDataPayload>()
 const cacheKey = 'data'
 
-export async function getData() {
+export async function getData(): Promise<DataPayload> {
   if (cache.has(cacheKey)) {
     console.log('CACHE: Data cache warm. Using cached data.')
-    return cache.get(cacheKey)
+    return generateDataPayload(cache.get(cacheKey)!)
   }
 
   console.log('CACHE: Data cache cold. Populating cache.')
@@ -144,16 +146,24 @@ export async function getData() {
     return acc
   }, {} as EntriesByYear)
 
+  cache.set(cacheKey, {
+    entriesByYear,
+  })
+  return generateDataPayload(cache.get(cacheKey)!)
+}
+
+function generateDataPayload({
+  entriesByYear,
+}: CachedDataPayload): DataPayload {
   const currentWeek = getISOWeek(new Date())
   const weekStatesByYear = deriveWeekStates(entriesByYear, currentWeek)
   const currentWeekState = getCurrentWeekState(weekStatesByYear, currentWeek)
 
-  cache.set(cacheKey, {
+  return {
     entriesByYear,
     weekStatesByYear,
     currentWeekState,
-  })
-  return cache.get(cacheKey)
+  }
 }
 
 export function clearCache() {
