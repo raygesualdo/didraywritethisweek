@@ -7,7 +7,7 @@ COPY . .
 RUN pnpm install --frozen-lockfile
 
 ENV NODE_ENV=production
-RUN npm run build
+RUN pnpm build
 RUN pnpm prune --prod
 
 FROM node:20-bullseye-slim

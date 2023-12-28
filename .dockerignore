@@ -6,3 +6,4 @@
 !pnpm-lock.yaml
 !remix.config.js
 !tailwind.config.js
+!tsconfig.json
