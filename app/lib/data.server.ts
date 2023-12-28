@@ -1,8 +1,6 @@
-import Parser from 'rss-parser'
 import { getISOWeek, getISOWeeksInYear, getYear } from 'date-fns'
 
 const YEARS_TO_PROCESS = ['2022', '2023', '2024'] as const
-const parser = new Parser()
 
 export const WeekStateEnum = {
   Yes: 'y',
@@ -33,9 +31,10 @@ function parseDate(date: string) {
 }
 
 async function getEntries() {
-  const feed = await parser.parseURL('https://www.raygesualdo.com/rss.xml')
-  const entries = feed.items.map((item) => {
-    const date = item.isoDate?.slice(0, 10) ?? ''
+  const dates = (await (
+    await fetch('https://www.raygesualdo.com/api/publish-dates.json')
+  ).json()) as string[]
+  const entries = dates.map((date) => {
     const { year } = parseDate(date)
     return { date, year, weekOfYear: getISOWeek(new Date(date)) }
   })
