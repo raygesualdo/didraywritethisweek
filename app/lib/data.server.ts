@@ -1,12 +1,8 @@
-import * as fs from 'fs'
-import * as path from 'path'
-import matter from 'gray-matter'
-import yaml from 'js-yaml'
-import tempy from 'tempy'
-import extract from 'extract-zip'
+import Parser from 'rss-parser'
 import { getISOWeek, getISOWeeksInYear, getYear } from 'date-fns'
 
 const YEARS_TO_PROCESS = ['2022', '2023', '2024'] as const
+const parser = new Parser()
 
 export const WeekStateEnum = {
   Yes: 'y',
@@ -26,26 +22,6 @@ type EntriesByYear = Record<string, Entry[]>
 
 type WeekStatesByYear = Record<(typeof YEARS_TO_PROCESS)[number], WeekState[]>
 
-async function downloadFile(url: string, filepath: string) {
-  const response = await fetch(url)
-  const filestream = fs.createWriteStream(filepath)
-  return new Promise((resolve, reject) => {
-    // @ts-expect-error Types for `Response.body` aren't quite right
-    response.body?.pipe(filestream)
-    // @ts-expect-error Types for `Response.body` aren't quite right
-    response.body?.on('error', reject)
-    filestream.on('finish', resolve)
-  })
-}
-
-const betterMatter = (input: string) => {
-  return matter(input, {
-    engines: {
-      yaml: (s) => yaml.load(s, { schema: yaml.JSON_SCHEMA }) as object,
-    },
-  })
-}
-
 function parseDate(date: string) {
   const match = date.match(/(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})/)
 
@@ -57,35 +33,12 @@ function parseDate(date: string) {
 }
 
 async function getEntries() {
-  let entries: Entry[]
-  await tempy.directory.task(async (tempPath) => {
-    const archivePath = path.join(tempPath, 'archive.zip')
-    const unzippedArchivePath = path.join(tempPath, 'archive')
-    await downloadFile(
-      'https://github.com/raygesualdo/raygesualdo.com/archive/refs/heads/main.zip',
-      archivePath
-    )
-    await extract(archivePath, { dir: unzippedArchivePath })
-    const blogPostsPath = path.join(
-      unzippedArchivePath,
-      'raygesualdo.com-main',
-      'src',
-      'content',
-      'posts'
-    )
-    entries = fs
-      .readdirSync(blogPostsPath)
-      .map((filePath) =>
-        fs.readFileSync(path.join(blogPostsPath, filePath), 'utf-8')
-      )
-      .map((markdown) => (betterMatter(markdown).data.date as string) ?? '')
-      .filter(Boolean)
-      .map((date) => {
-        const { year } = parseDate(date)
-        return { date, year, weekOfYear: getISOWeek(new Date(date)) }
-      })
+  const feed = await parser.parseURL('https://www.raygesualdo.com/rss.xml')
+  const entries = feed.items.map((item) => {
+    const date = item.isoDate?.slice(0, 10) ?? ''
+    const { year } = parseDate(date)
+    return { date, year, weekOfYear: getISOWeek(new Date(date)) }
   })
-  // @ts-expect-error Assigning `entries` in the tempy task doesn't sit well with TS
   return entries
 }
 
