@@ -6,7 +6,7 @@ import tempy from 'tempy'
 import extract from 'extract-zip'
 import { getISOWeek, getISOWeeksInYear, getYear } from 'date-fns'
 
-const YEARS_TO_PROCESS = ['2022'] as const
+const YEARS_TO_PROCESS = ['2022', '2023', '2024'] as const
 
 export const WeekStateEnum = {
   Yes: 'y',
@@ -14,7 +14,7 @@ export const WeekStateEnum = {
   Unknown: 'u',
 } as const
 
-export type WeekState = typeof WeekStateEnum[keyof typeof WeekStateEnum]
+export type WeekState = (typeof WeekStateEnum)[keyof typeof WeekStateEnum]
 
 interface Entry {
   date: string
@@ -24,7 +24,7 @@ interface Entry {
 
 type EntriesByYear = Record<string, Entry[]>
 
-type WeekStatesByYear = Record<typeof YEARS_TO_PROCESS[number], WeekState[]>
+type WeekStatesByYear = Record<(typeof YEARS_TO_PROCESS)[number], WeekState[]>
 
 async function downloadFile(url: string, filepath: string) {
   const response = await fetch(url)
@@ -69,6 +69,7 @@ async function getEntries() {
     const blogPostsPath = path.join(
       unzippedArchivePath,
       'raygesualdo.com-main',
+      'src',
       'content',
       'posts'
     )
@@ -92,27 +93,23 @@ function deriveWeekStates(
   entriesByYear: EntriesByYear,
   currentWeek: number
 ): WeekStatesByYear {
+  // @ts-expect-error - TS doesn't understand the resulting object's keys will be `YEARS_TO_PROCESS`
   return Object.fromEntries(
     YEARS_TO_PROCESS.map((year) => {
-      if (!entriesByYear[year]) return []
-
       const numOfWeeksInYear = getISOWeeksInYear(
         new Date(Number.parseInt(year, 10), 0, 1)
       )
-      const weeks = Array.from(
-        { length: numOfWeeksInYear - 1 },
-        (_, index) => index + 1
-      )
       const weeksWithEntries = new Set(
-        entriesByYear[year].map((entry) => entry.weekOfYear)
+        entriesByYear[year]?.map((entry) => entry.weekOfYear) ?? []
       )
 
-      const yolo = weeks.map((week) => {
+      const weeks = Array.from({ length: numOfWeeksInYear - 1 }, (_, index) => {
+        const week = index + 1
         if (week > currentWeek) return WeekStateEnum.Unknown
         return weeksWithEntries.has(week) ? WeekStateEnum.Yes : WeekStateEnum.No
       })
 
-      return [year, yolo]
+      return [year, weeks]
     })
   )
 }
@@ -173,5 +170,7 @@ export function clearCache() {
 
 function getCurrentWeekState(result: WeekStatesByYear, currentWeek: number) {
   const currentYear = getYear(new Date())
-  return result[String(currentYear) as keyof WeekStatesByYear][currentWeek - 1]
+  return result[String(currentYear) as keyof WeekStatesByYear]?.[
+    currentWeek - 1
+  ]
 }
