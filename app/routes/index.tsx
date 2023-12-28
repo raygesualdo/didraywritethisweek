@@ -24,23 +24,25 @@ export default function Index() {
         {data.currentWeekState === 'y' ? 'Yes' : 'No'}
       </h2>
       <div className="mx-auto w-max max-w-full">
-        {Object.entries(data.weekStatesByYear).map(([year, weeks]) => {
-          return (
-            <Fragment key={year}>
-              <h3 className="font-medium mb-2 text-xl">{year}</h3>
-              <div className="flex gap-1 flex-wrap">
-                {weeks.map((week, index) => {
-                  return (
-                    <div
-                      key={index}
-                      className={`h-4 rounded w-4 ${classMap[week]}`}
-                    />
-                  )
-                })}
-              </div>
-            </Fragment>
-          )
-        })}
+        {Object.entries(data.weekStatesByYear)
+          .reverse()
+          .map(([year, weeks]) => {
+            return (
+              <Fragment key={year}>
+                <h3 className="font-medium mb-2 text-xl">{year}</h3>
+                <div className="flex gap-1 flex-wrap">
+                  {weeks.map((week, index) => {
+                    return (
+                      <div
+                        key={index}
+                        className={`h-4 rounded w-4 ${classMap[week]}`}
+                      />
+                    )
+                  })}
+                </div>
+              </Fragment>
+            )
+          })}
       </div>
       <div className="absolute left-0 bottom-2 px-2 text-center text-gray-600 text-xs w-full flex flex-col sm:block">
         <span>
