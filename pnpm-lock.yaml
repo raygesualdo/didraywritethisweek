@@ -5,6 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
+  '@remix-run/node':
+    specifier: 1.1.3
+    version: 1.1.3(react-dom@17.0.2)(react@17.0.2)
   '@remix-run/react':
     specifier: ^1.1.3
     version: 1.1.3(react-dom@17.0.2)(react@17.0.2)
