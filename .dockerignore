@@ -1,1 +1,8 @@
-node_modules
+*
+
+!app
+!public
+!package.json
+!pnpm-lock.yaml
+!remix.config.js
+!tailwind.config.js

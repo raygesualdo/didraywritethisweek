@@ -6,10 +6,6 @@ on:
       - main
   pull_request:
 
-env:
-  NODE_VERSION: 16
-  FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
-
 jobs:
   ci:
     name: CI
@@ -17,25 +13,44 @@ jobs:
 
     steps:
       - name: Check out code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up node
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
-          node-version-file: '.node-version'
-          cache: 'npm'
+          node-version-file: '.tool-versions'
+
+      - name: Install PNPM
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8.12.1
+          run_install: false
+
+      - name: Get PNPM store directory
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Setup PNPM cache
+        uses: actions/cache@v3
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
 
       - name: Install dependencies
-        run: npm install
+        run: pnpm install
 
       - name: Build project
-        run: npm run build
+        run: pnpm build
 
       - name: Run type checks
-        run: npm run typecheck
+        run: pnpm typecheck
 
       - name: Deploy to Fly.io
         if: github.ref == 'refs/heads/main'
         uses: superfly/flyctl-actions@1.1
         with:
           args: 'deploy'
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}

@@ -1,52 +1,23 @@
-# base node image
-FROM node:16-bullseye-slim as base
+FROM node:20-bullseye-slim as builder
 
-# Install openssl for Prisma
-RUN apt-get update && apt-get install -y openssl
-
-# Install all node_modules, including dev dependencies
-FROM base as deps
-
-RUN mkdir /app
 WORKDIR /app
 
-ADD package.json package-lock.json ./
-RUN npm install --production=false
-
-# Setup production node_modules
-FROM base as production-deps
-
-RUN mkdir /app
-WORKDIR /app
-
-COPY --from=deps /app/node_modules /app/node_modules
-ADD package.json package-lock.json ./
-RUN npm prune --production
-
-# Build the app
-FROM base as build
+RUN npm i -g pnpm@8.12.1
+COPY . .
+RUN pnpm install --frozen-lockfile
 
 ENV NODE_ENV=production
-
-RUN mkdir /app
-WORKDIR /app
-
-COPY --from=deps /app/node_modules /app/node_modules
-
-ADD . .
 RUN npm run build
+RUN pnpm prune --prod
 
-# Finally, build the production image with minimal footprint
-FROM base
+FROM node:20-bullseye-slim
 
+WORKDIR /app
 ENV NODE_ENV=production
 
-RUN mkdir /app
-WORKDIR /app
+COPY --from=builder /tmp/node_modules /app/node_modules
+COPY --from=builder /tmp/build /app/build
+COPY --from=builder /tmp/public /app/public
+COPY --from=builder /tmp/package.json /app/package.json
 
-COPY --from=production-deps /app/node_modules /app/node_modules
-COPY --from=build /app/build /app/build
-COPY --from=build /app/public /app/public
-ADD . .
-
-CMD ["npm", "run", "start"]
+CMD [ "npm", "start" ]
