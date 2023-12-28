@@ -1,6 +1,6 @@
 import { Fragment } from 'react'
-import { json, LoaderFunction, useLoaderData } from 'remix'
-import { DataPayload, getData, WeekState } from '~/lib/data.server'
+import { useLoaderData } from '@remix-run/react'
+import { getData, WeekState } from '~/lib/data.server'
 
 const classMap: Record<WeekState, string> = {
   y: 'bg-green-300',
@@ -8,13 +8,13 @@ const classMap: Record<WeekState, string> = {
   u: 'bg-gray-300',
 }
 
-export const loader: LoaderFunction = async () => {
+export const loader = async () => {
   const data = await getData()
-  return json(data)
+  return data
 }
 
 export default function Index() {
-  const data = useLoaderData<DataPayload>()
+  const data = useLoaderData<typeof loader>()
   return (
     <div className="px-8">
       <h1 className="font-light mt-16 text-5xl text-center">

@@ -3,18 +3,17 @@ import {
   LiveReload,
   Meta,
   Outlet,
-  Scripts,
   ScrollRestoration,
-} from 'remix'
-import type { MetaFunction } from 'remix'
-import styles from './styles.css'
+} from '@remix-run/react'
+import type { LinksFunction, MetaFunction } from '@remix-run/node'
+import stylesheet from '~/tailwind.css'
 
-export function links() {
-  return [{ rel: 'stylesheet', href: styles }]
+export const links: LinksFunction = () => {
+  return [{ rel: 'stylesheet', href: stylesheet }]
 }
 
 export const meta: MetaFunction = () => {
-  return { title: 'Did Ray write this week?' }
+  return [{ title: 'Did Ray write this week?' }]
 }
 
 export default function App() {

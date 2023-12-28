@@ -1,4 +1,4 @@
-import { json, LoaderFunction } from 'remix'
+import { json, LoaderFunction } from '@remix-run/node'
 import { getData } from '~/lib/data.server'
 
 export const loader: LoaderFunction = async () => {
