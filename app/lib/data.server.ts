@@ -1,6 +1,6 @@
 import { getISOWeek, getISOWeeksInYear, getYear } from 'date-fns'
 
-const YEARS_TO_PROCESS = ['2022', '2023', '2024'] as const
+const YEARS_TO_PROCESS = ['2022', '2024'] as const
 
 export const WeekStateEnum = {
   Yes: 'y',

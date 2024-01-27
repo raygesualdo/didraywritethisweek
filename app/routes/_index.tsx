@@ -20,7 +20,7 @@ export default function Index() {
       <h1 className="font-light mt-16 text-5xl text-center">
         Did Ray write this week?
       </h1>
-      <h2 className="mb-16 mt-8 text-8xl text-center">
+      <h2 className="mb-12 mt-8 text-8xl text-center">
         {data.currentWeekState === 'y' ? 'Yes' : 'No'}
       </h2>
       <div className="mx-auto w-max max-w-full">
@@ -29,7 +29,9 @@ export default function Index() {
           .map(([year, weeks]) => {
             return (
               <Fragment key={year}>
-                <h3 className="font-medium mb-2 text-xl">{year}</h3>
+                <h3 className="font-medium first:mt-0 mt-4 mb-1 text-xl">
+                  {year}
+                </h3>
                 <div className="flex gap-1 flex-wrap">
                   {weeks.map((week, index) => {
                     return (
