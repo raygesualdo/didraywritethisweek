@@ -32,13 +32,17 @@ export default function Index() {
                 <h3 className="font-medium first:mt-0 mt-4 mb-1 text-xl">
                   {year}
                 </h3>
-                <div className="flex gap-1 flex-wrap">
+                <div className="flex gap-1 flex-wrap group">
                   {weeks.map((week, index) => {
                     return (
                       <div
                         key={index}
-                        className={`h-4 rounded w-4 ${classMap[week]}`}
-                      />
+                        className={`grid place-content-center h-4 rounded w-4 ${classMap[week]}`}
+                      >
+                        <span className="text-[10px] hidden group-hover:block cursor-default text-slate-700">
+                          {index + 1}
+                        </span>
+                      </div>
                     )
                   })}
                 </div>
