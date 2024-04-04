@@ -44,7 +44,7 @@ function deriveWeekStates(
       const weeksWithEntries = new Set(
         entriesByYear[year]?.map((entry) => getISOWeek(new Date(entry.date)))
       )
-      const weeks = Array.from({ length: numOfWeeksInYear - 1 }, (_, index) => {
+      const weeks = Array.from({ length: numOfWeeksInYear }, (_, index) => {
         if (year > currentYear) return WeekStateEnum.Unknown
         const week = index + 1
         if (week > currentWeek && year === currentYear)
